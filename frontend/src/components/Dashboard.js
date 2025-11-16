@@ -15,7 +15,11 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadExchanges();
-    initScrollAnimations();
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      initScrollAnimations();
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const loadExchanges = async () => {

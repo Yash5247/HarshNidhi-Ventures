@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchExchanges } from '../utils/apiClient';
+import { initScrollAnimations } from '../utils/scrollAnimation';
 import LoadingSpinner from './LoadingSpinner';
 import './Exchanges.css';
 
@@ -10,6 +11,10 @@ const Exchanges = () => {
 
   useEffect(() => {
     loadExchanges();
+    const timer = setTimeout(() => {
+      initScrollAnimations();
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const loadExchanges = async () => {
@@ -50,8 +55,8 @@ const Exchanges = () => {
         </p>
 
         <div className="exchanges-grid">
-          {exchanges.map((exchange) => (
-            <div key={exchange.id} className="exchange-card">
+          {exchanges.map((exchange, index) => (
+            <div key={exchange.id} className={`exchange-card animate-on-scroll`} style={{ transitionDelay: `${index * 0.1}s` }}>
               <h3>{exchange.name}</h3>
               <p className="exchange-id">ID: {exchange.id}</p>
               <div className="exchange-status">

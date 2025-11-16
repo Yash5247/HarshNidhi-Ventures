@@ -5,7 +5,11 @@ import './Home.css';
 
 const Home = () => {
   useEffect(() => {
-    initScrollAnimations();
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      initScrollAnimations();
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   return (

@@ -190,7 +190,7 @@
 }
 
 .feature-card:hover .feature-icon {
-  transform: scale(1.1) translateY(-5px);
+  transform: scale(1.1);
   filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.4));
 }
 

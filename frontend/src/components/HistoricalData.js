@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { fetchExchanges, fetchHistoricalData } from '../utils/apiClient';
+import { initScrollAnimations } from '../utils/scrollAnimation';
 import './HistoricalData.css';
 
 const HistoricalData = () => {
@@ -15,6 +16,10 @@ const HistoricalData = () => {
 
   useEffect(() => {
     loadExchanges();
+    const timer = setTimeout(() => {
+      initScrollAnimations();
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const loadExchanges = async () => {

@@ -4,21 +4,35 @@
 
 export const initScrollAnimations = () => {
   const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    threshold: 0.15,
+    rootMargin: '0px 0px -100px 0px'
   };
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
+        // Don't unobserve to allow re-animation if needed
       }
     });
   }, observerOptions);
 
   // Observe all elements with animate-on-scroll class
   const elements = document.querySelectorAll('.animate-on-scroll');
-  elements.forEach(el => observer.observe(el));
+  elements.forEach(el => {
+    observer.observe(el);
+  });
+
+  // Re-observe on dynamic content changes
+  const mutationObserver = new MutationObserver(() => {
+    const newElements = document.querySelectorAll('.animate-on-scroll:not(.visible)');
+    newElements.forEach(el => observer.observe(el));
+  });
+
+  mutationObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
 
   return observer;
 };
@@ -39,7 +53,7 @@ export const addScrollAnimation = (element, animationType = 'fadeInUp') => {
       element.classList.add('scale-in');
       break;
     default:
-      // fadeInUp is default
+      // fadeInUp is default (translateY)
       break;
   }
 
@@ -50,8 +64,7 @@ export const addScrollAnimation = (element, animationType = 'fadeInUp') => {
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1 });
+  }, { threshold: 0.15, rootMargin: '0px 0px -100px 0px' });
 
   observer.observe(element);
 };
-
