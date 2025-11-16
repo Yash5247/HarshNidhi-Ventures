@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchExchanges, fetchTicker } from '../utils/apiClient';
+import { initScrollAnimations } from '../utils/scrollAnimation';
 import Stats from './Stats';
 import './Dashboard.css';
 
@@ -14,6 +15,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadExchanges();
+    initScrollAnimations();
   }, []);
 
   const loadExchanges = async () => {
@@ -64,12 +66,14 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <div className="dashboard-header">
+      <div className="dashboard-header animate-on-scroll">
         <h1>📊 Real-Time Market Data</h1>
         <p>Get live cryptocurrency prices from major exchanges</p>
       </div>
 
-      <Stats />
+      <div className="animate-on-scroll">
+        <Stats />
+      </div>
 
       <div className="card">
         <h2>Fetch Market Data</h2>

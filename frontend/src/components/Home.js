@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { initScrollAnimations } from '../utils/scrollAnimation';
 import './Home.css';
 
 const Home = () => {
+  useEffect(() => {
+    initScrollAnimations();
+  }, []);
+
   return (
     <div className="home">
-      <div className="hero-section">
+      <div className="hero-section animate-on-scroll">
         <h1 className="hero-title">🚀 Cryptocurrency MCP Server</h1>
         <p className="hero-subtitle">
           Real-time and historical cryptocurrency market data from major exchanges
@@ -20,25 +25,25 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="features-section">
+      <div className="features-section animate-on-scroll">
         <h2>Features</h2>
         <div className="features-grid">
-          <div className="feature-card">
+          <div className="feature-card animate-on-scroll">
             <div className="feature-icon">📊</div>
             <h3>Real-Time Data</h3>
             <p>Get live ticker prices and market data from multiple cryptocurrency exchanges</p>
           </div>
-          <div className="feature-card">
+          <div className="feature-card animate-on-scroll">
             <div className="feature-icon">📈</div>
             <h3>Historical Charts</h3>
             <p>View historical OHLCV data with interactive charts and multiple timeframes</p>
           </div>
-          <div className="feature-card">
+          <div className="feature-card animate-on-scroll">
             <div className="feature-icon">🔄</div>
             <h3>Multi-Exchange</h3>
             <p>Access data from Binance, Coinbase, Kraken, and more via CCXT library</p>
           </div>
-          <div className="feature-card">
+          <div className="feature-card animate-on-scroll">
             <div className="feature-icon">⚡</div>
             <h3>Fast & Cached</h3>
             <p>Optimized performance with intelligent caching and WebSocket support</p>
@@ -46,7 +51,7 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="info-section">
+      <div className="info-section animate-on-scroll">
         <h2>About This Project</h2>
         <div className="info-content">
           <p>
@@ -70,18 +75,18 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="quick-links">
+      <div className="quick-links animate-on-scroll">
         <h2>Quick Links</h2>
         <div className="links-grid">
-          <Link to="/dashboard" className="link-card">
+          <Link to="/dashboard" className="link-card animate-on-scroll">
             <h3>📊 Dashboard</h3>
             <p>View real-time market data</p>
           </Link>
-          <Link to="/historical" className="link-card">
+          <Link to="/historical" className="link-card animate-on-scroll">
             <h3>📈 Historical Data</h3>
             <p>Explore price charts</p>
           </Link>
-          <Link to="/exchanges" className="link-card">
+          <Link to="/exchanges" className="link-card animate-on-scroll">
             <h3>🏦 Exchanges</h3>
             <p>See supported exchanges</p>
           </Link>
