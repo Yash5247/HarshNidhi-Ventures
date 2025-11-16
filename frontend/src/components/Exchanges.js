@@ -1,35 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { API_BASE_URL } from '../config/api';
-import ApiError from './ApiError';
+import { fetchExchanges } from '../utils/apiClient';
 import LoadingSpinner from './LoadingSpinner';
 import './Exchanges.css';
 
 const Exchanges = () => {
   const [exchanges, setExchanges] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
-    fetchExchanges();
+    loadExchanges();
   }, []);
 
-  const fetchExchanges = async () => {
+  const loadExchanges = async () => {
     setLoading(true);
-    setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/exchanges`);
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('404: NOT_FOUND - Exchanges endpoint not available');
-        }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      const data = await response.json();
+      const data = await fetchExchanges();
       setExchanges(data.exchanges || []);
-      setError(null);
+      if (data.exchanges && data.exchanges[0]?.id === 'binance') {
+        setIsDemoMode(true);
+      }
     } catch (err) {
-      console.error('Error fetching exchanges:', err);
-      setError(err);
+      console.error('Error loading exchanges:', err);
+      setIsDemoMode(true);
     } finally {
       setLoading(false);
     }
@@ -43,18 +36,15 @@ const Exchanges = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="card">
-        <ApiError error={error} onRetry={fetchExchanges} />
-      </div>
-    );
-  }
-
   return (
     <div className="exchanges">
       <div className="card">
         <h2>Supported Exchanges</h2>
+        {isDemoMode && (
+          <div className="demo-notice">
+            <p>📊 <strong>Demo Mode:</strong> Showing sample exchange data.</p>
+          </div>
+        )}
         <p className="subtitle">
           These are the cryptocurrency exchanges currently supported by the MCP server.
         </p>

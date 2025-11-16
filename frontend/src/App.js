@@ -13,13 +13,29 @@ function App() {
   const [healthStatus, setHealthStatus] = useState('checking');
 
   useEffect(() => {
-    // Check backend health
-    fetch(`${API_BASE_URL}/health`)
-      .then(res => res.json())
-      .then(data => {
-        setHealthStatus(data.status === 'healthy' ? 'online' : 'offline');
-      })
-      .catch(() => setHealthStatus('offline'));
+    // Check backend health with timeout
+    const checkHealth = async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        
+        const res = await fetch(`${API_BASE_URL}/health`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
+        if (res.ok) {
+          const data = await res.json();
+          setHealthStatus(data.status === 'healthy' ? 'online' : 'offline');
+        } else {
+          setHealthStatus('offline');
+        }
+      } catch (error) {
+        setHealthStatus('offline');
+      }
+    };
+    
+    checkHealth();
   }, []);
 
   return (

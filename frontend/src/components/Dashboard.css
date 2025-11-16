@@ -153,3 +153,18 @@
   font-weight: bold;
 }
 
+.demo-notice {
+  background: #e7f3ff;
+  border: 2px solid #2196F3;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #1976D2;
+}
+
+.demo-notice p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+

@@ -1,70 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { API_BASE_URL } from '../config/api';
+import { fetchExchanges, fetchTicker } from '../utils/apiClient';
 import Stats from './Stats';
-import ApiError from './ApiError';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const [exchanges, setExchanges] = useState([]);
-  const [selectedExchange, setSelectedExchange] = useState('');
+  const [selectedExchange, setSelectedExchange] = useState('binance');
   const [selectedSymbol, setSelectedSymbol] = useState('BTC/USDT');
   const [ticker, setTicker] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
-    fetchExchanges();
+    loadExchanges();
   }, []);
+
+  const loadExchanges = async () => {
+    try {
+      const data = await fetchExchanges();
+      setExchanges(data.exchanges || []);
+      if (data.exchanges && data.exchanges.length > 0) {
+        setSelectedExchange(data.exchanges[0].id);
+      }
+      // Check if using mock data
+      if (data.exchanges && data.exchanges[0]?.id === 'binance') {
+        setIsDemoMode(true);
+      }
+    } catch (err) {
+      console.error('Error loading exchanges:', err);
+      setIsDemoMode(true);
+    }
+  };
 
   useEffect(() => {
     if (autoRefresh && selectedExchange && selectedSymbol) {
       const interval = setInterval(() => {
-        fetchTicker();
+        loadTicker();
       }, 5000); // Refresh every 5 seconds
       return () => clearInterval(interval);
     }
   }, [autoRefresh, selectedExchange, selectedSymbol]);
 
-  const fetchExchanges = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/exchanges`);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      const data = await response.json();
-      setExchanges(data.exchanges || []);
-      if (data.exchanges && data.exchanges.length > 0) {
-        setSelectedExchange(data.exchanges[0].id);
-      }
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching exchanges:', err);
-      setError(err);
-    }
-  };
-
-  const fetchTicker = async () => {
+  const loadTicker = async () => {
     if (!selectedExchange || !selectedSymbol) return;
 
     setLoading(true);
-    setError(null);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/ticker/${selectedExchange}/${selectedSymbol}`
-      );
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error(`404: NOT_FOUND - ${selectedSymbol} not found on ${selectedExchange}`);
-        }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      const data = await response.json();
+      const data = await fetchTicker(selectedExchange, selectedSymbol);
       setTicker(data);
-      setError(null);
+      setIsDemoMode(data.exchange === 'binance' && !data.timestamp);
     } catch (err) {
-      console.error('Error fetching ticker:', err);
-      setError(err);
+      console.error('Error loading ticker:', err);
+      // Still try to show something
+      setIsDemoMode(true);
     } finally {
       setLoading(false);
     }
@@ -72,7 +61,7 @@ const Dashboard = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetchTicker();
+    loadTicker();
   };
 
   return (
@@ -131,15 +120,13 @@ const Dashboard = () => {
           </div>
         </form>
 
-        {error && (
-          <ApiError 
-            error={error} 
-            onRetry={selectedExchange && selectedSymbol ? fetchTicker : fetchExchanges}
-            message={error?.message || error}
-          />
+        {isDemoMode && (
+          <div className="demo-notice">
+            <p>📊 <strong>Demo Mode:</strong> Showing sample data. Connect to backend for live data.</p>
+          </div>
         )}
 
-        {!ticker && !loading && !error && (
+        {!ticker && !loading && (
           <div className="empty-state">
             <div className="empty-icon">📊</div>
             <h3>No Data Yet</h3>

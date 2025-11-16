@@ -1,77 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { API_BASE_URL } from '../config/api';
-import ApiError from './ApiError';
+import { fetchExchanges, fetchHistoricalData } from '../utils/apiClient';
 import './HistoricalData.css';
 
 const HistoricalData = () => {
   const [exchanges, setExchanges] = useState([]);
-  const [selectedExchange, setSelectedExchange] = useState('');
+  const [selectedExchange, setSelectedExchange] = useState('binance');
   const [selectedSymbol, setSelectedSymbol] = useState('BTC/USDT');
   const [timeframe, setTimeframe] = useState('1h');
   const [limit, setLimit] = useState(100);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
-    fetchExchanges();
+    loadExchanges();
   }, []);
 
-  const fetchExchanges = async () => {
+  const loadExchanges = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/exchanges`);
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('404: NOT_FOUND - Exchanges endpoint not available');
-        }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      const result = await fetchExchanges();
+      setExchanges(result.exchanges || []);
+      if (result.exchanges && result.exchanges.length > 0) {
+        setSelectedExchange(result.exchanges[0].id);
       }
-      const data = await response.json();
-      setExchanges(data.exchanges || []);
-      if (data.exchanges && data.exchanges.length > 0) {
-        setSelectedExchange(data.exchanges[0].id);
+      if (result.exchanges && result.exchanges[0]?.id === 'binance') {
+        setIsDemoMode(true);
       }
-      setError(null);
     } catch (err) {
-      console.error('Error fetching exchanges:', err);
-      setError(err);
+      console.error('Error loading exchanges:', err);
+      setIsDemoMode(true);
     }
   };
 
-  const fetchHistoricalData = async (e) => {
+  const loadHistoricalData = async (e) => {
     e.preventDefault();
     if (!selectedExchange || !selectedSymbol) return;
 
     setLoading(true);
-    setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/historical`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          exchange: selectedExchange,
-          symbol: selectedSymbol,
-          timeframe: timeframe,
-          limit: limit,
-        }),
-      });
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error(`404: NOT_FOUND - Historical data not found for ${selectedSymbol} on ${selectedExchange}`);
-        }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
+      const result = await fetchHistoricalData(
+        selectedExchange,
+        selectedSymbol,
+        timeframe,
+        limit
+      );
       setData(result.data || []);
-      setError(null);
+      setIsDemoMode(result.exchange === 'binance');
     } catch (err) {
-      console.error('Error fetching historical data:', err);
-      setError(err);
+      console.error('Error loading historical data:', err);
+      setIsDemoMode(true);
     } finally {
       setLoading(false);
     }
@@ -91,7 +69,13 @@ const HistoricalData = () => {
       <div className="card">
         <h2>Historical Market Data</h2>
 
-        <form onSubmit={fetchHistoricalData}>
+        {isDemoMode && (
+          <div className="demo-notice">
+            <p>📊 <strong>Demo Mode:</strong> Showing sample historical data.</p>
+          </div>
+        )}
+
+        <form onSubmit={loadHistoricalData}>
           <div className="form-row">
             <div className="form-group">
               <label>Exchange</label>
@@ -153,13 +137,6 @@ const HistoricalData = () => {
             {loading ? 'Loading...' : 'Fetch Historical Data'}
           </button>
         </form>
-
-        {error && (
-          <ApiError 
-            error={error} 
-            onRetry={selectedExchange && selectedSymbol ? () => fetchHistoricalData({ preventDefault: () => {} }) : fetchExchanges}
-          />
-        )}
 
         {data.length > 0 && (
           <div className="chart-container">
