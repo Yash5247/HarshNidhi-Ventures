@@ -29,6 +29,7 @@
   font-size: 1.5rem;
   color: #667eea;
   font-weight: bold;
+  margin: 0;
 }
 
 .nav-links {
@@ -140,6 +141,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.3s;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .btn:hover {
@@ -151,10 +154,26 @@
   cursor: not-allowed;
 }
 
+.btn-primary {
+  background: #667eea;
+}
+
+.btn-secondary {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.btn-secondary:hover {
+  background: #667eea;
+  color: white;
+}
+
 .loading {
   text-align: center;
   padding: 2rem;
   color: #666;
+  font-size: 1.1rem;
 }
 
 .error {
@@ -166,13 +185,6 @@
   border-left: 4px solid #dc3545;
 }
 
-.loading {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  font-size: 1.1rem;
-}
-
 .success {
   background: #d4edda;
   color: #155724;
@@ -180,4 +192,3 @@
   border-radius: 8px;
   margin-bottom: 1rem;
 }
-

@@ -23,7 +23,6 @@ const Dashboard = () => {
       if (data.exchanges && data.exchanges.length > 0) {
         setSelectedExchange(data.exchanges[0].id);
       }
-      // Check if using mock data
       if (data.exchanges && data.exchanges[0]?.id === 'binance') {
         setIsDemoMode(true);
       }
@@ -37,7 +36,7 @@ const Dashboard = () => {
     if (autoRefresh && selectedExchange && selectedSymbol) {
       const interval = setInterval(() => {
         loadTicker();
-      }, 5000); // Refresh every 5 seconds
+      }, 5000);
       return () => clearInterval(interval);
     }
   }, [autoRefresh, selectedExchange, selectedSymbol]);
@@ -52,7 +51,6 @@ const Dashboard = () => {
       setIsDemoMode(data.exchange === 'binance' && !data.timestamp);
     } catch (err) {
       console.error('Error loading ticker:', err);
-      // Still try to show something
       setIsDemoMode(true);
     } finally {
       setLoading(false);
@@ -172,7 +170,7 @@ const Dashboard = () => {
               </div>
             </div>
             <p className="timestamp">
-              Last updated: {new Date(ticker.timestamp).toLocaleString()}
+              Last updated: {new Date(ticker.timestamp || Date.now()).toLocaleString()}
             </p>
           </div>
         )}
@@ -182,4 +180,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
