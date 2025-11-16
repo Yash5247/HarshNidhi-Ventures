@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../config/api';
+import Stats from './Stats';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -65,8 +66,15 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
+      <div className="dashboard-header">
+        <h1>📊 Real-Time Market Data</h1>
+        <p>Get live cryptocurrency prices from major exchanges</p>
+      </div>
+
+      <Stats />
+
       <div className="card">
-        <h2>Real-Time Market Data</h2>
+        <h2>Fetch Market Data</h2>
         
         <form onSubmit={handleSubmit}>
           <div className="form-row">
@@ -113,6 +121,22 @@ const Dashboard = () => {
         </form>
 
         {error && <div className="error">{error}</div>}
+
+        {!ticker && !loading && !error && (
+          <div className="empty-state">
+            <div className="empty-icon">📊</div>
+            <h3>No Data Yet</h3>
+            <p>Select an exchange and trading pair, then click "Fetch Data" to see real-time market information.</p>
+            <div className="empty-tips">
+              <p><strong>💡 Tip:</strong> Try popular pairs like:</p>
+              <ul>
+                <li>BTC/USDT (Bitcoin)</li>
+                <li>ETH/USDT (Ethereum)</li>
+                <li>BNB/USDT (Binance Coin)</li>
+              </ul>
+            </div>
+          </div>
+        )}
 
         {ticker && (
           <div className="ticker-display">

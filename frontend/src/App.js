@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
+import Home from './components/Home';
 import Dashboard from './components/Dashboard';
 import HistoricalData from './components/HistoricalData';
 import Exchanges from './components/Exchanges';
@@ -26,7 +27,8 @@ function App() {
           <div className="nav-container">
             <h1 className="logo">🚀 Crypto MCP Dashboard</h1>
             <div className="nav-links">
-              <Link to="/">Dashboard</Link>
+              <Link to="/">Home</Link>
+              <Link to="/dashboard">Dashboard</Link>
               <Link to="/historical">Historical Data</Link>
               <Link to="/exchanges">Exchanges</Link>
             </div>
@@ -38,7 +40,8 @@ function App() {
 
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/historical" element={<HistoricalData />} />
             <Route path="/exchanges" element={<Exchanges />} />
           </Routes>
