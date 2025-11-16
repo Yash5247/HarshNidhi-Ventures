@@ -79,7 +79,7 @@ const Dashboard = () => {
         <Stats />
       </div>
 
-      <div className="card">
+      <div className="card animate-on-scroll">
         <h2>Fetch Market Data</h2>
         
         <form onSubmit={handleSubmit}>

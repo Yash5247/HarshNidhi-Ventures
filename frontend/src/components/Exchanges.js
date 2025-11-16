@@ -43,7 +43,7 @@ const Exchanges = () => {
 
   return (
     <div className="exchanges">
-      <div className="card">
+      <div className="card animate-on-scroll">
         <h2>Supported Exchanges</h2>
         {isDemoMode && (
           <div className="demo-notice">

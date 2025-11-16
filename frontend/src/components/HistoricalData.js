@@ -71,7 +71,7 @@ const HistoricalData = () => {
 
   return (
     <div className="historical-data">
-      <div className="card">
+      <div className="card animate-on-scroll">
         <h2>Historical Market Data</h2>
 
         {isDemoMode && (
