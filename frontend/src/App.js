@@ -13,12 +13,19 @@ function App() {
 
   useEffect(() => {
     const checkHealth = async () => {
+      // Skip health check if using localhost (development) or if API URL is not set
+      if (API_BASE_URL.includes('localhost') || !API_BASE_URL || API_BASE_URL === 'http://localhost:8000') {
+        setHealthStatus('offline');
+        return;
+      }
+
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
         
         const res = await fetch(`${API_BASE_URL}/health`, {
-          signal: controller.signal
+          signal: controller.signal,
+          mode: 'cors'
         });
         clearTimeout(timeoutId);
         
@@ -29,11 +36,17 @@ function App() {
           setHealthStatus('offline');
         }
       } catch (error) {
+        // Silently fail - offline is expected if backend is not deployed
         setHealthStatus('offline');
       }
     };
     
     checkHealth();
+    
+    // Optionally check health periodically
+    const interval = setInterval(checkHealth, 30000); // Check every 30 seconds
+    
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -50,8 +63,8 @@ function App() {
               <Link to="/historical">Historical Data</Link>
               <Link to="/exchanges">Exchanges</Link>
             </div>
-            <div className={`status-indicator ${healthStatus}`}>
-              {healthStatus === 'online' ? '🟢 Online' : '🔴 Offline'}
+            <div className={`status-indicator ${healthStatus}`} title={healthStatus === 'online' ? 'Backend connected' : 'Backend not connected - using demo mode'}>
+              {healthStatus === 'online' ? '🟢 Online' : '🔴 Demo Mode'}
             </div>
           </div>
         </nav>
