@@ -1,116 +1,87 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
+import Home from './components/Home';
+import Dashboard from './components/Dashboard';
+import HistoricalData from './components/HistoricalData';
+import Exchanges from './components/Exchanges';
+import NotFound from './components/NotFound';
+import { API_BASE_URL } from './config/api';
 
 function App() {
+  const [healthStatus, setHealthStatus] = useState('offline');
+
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        
+        const res = await fetch(`${API_BASE_URL}/health`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
+        if (res.ok) {
+          const data = await res.json();
+          setHealthStatus(data.status === 'healthy' ? 'online' : 'offline');
+        } else {
+          setHealthStatus('offline');
+        }
+      } catch (error) {
+        setHealthStatus('offline');
+      }
+    };
+    
+    checkHealth();
+  }, []);
+
   return (
-    <div className="App">
-      <nav className="navbar">
-        <div className="nav-container">
-          <h1 className="logo">🚀 Crypto MCP Dashboard</h1>
-          <div className="status">🔴 Offline</div>
-        </div>
-      </nav>
-
-      <main className="main-content">
-        <div className="hero">
-          <h1 className="hero-title">🚀 Cryptocurrency MCP Server</h1>
-          <p className="hero-subtitle">
-            Real-time and historical cryptocurrency market data from major exchanges
-          </p>
-          <div className="hero-buttons">
-            <button className="btn btn-primary">View Dashboard</button>
-            <button className="btn btn-secondary">View Exchanges</button>
-          </div>
-        </div>
-
-        <div className="features">
-          <h2>Features</h2>
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon">📊</div>
-              <h3>Real-Time Data</h3>
-              <p>Get live ticker prices and market data from multiple cryptocurrency exchanges</p>
+    <Router>
+      <div className="App">
+        <nav className="navbar">
+          <div className="nav-container">
+            <Link to="/" className="logo-link">
+              <h1 className="logo">🚀 Crypto MCP Dashboard</h1>
+            </Link>
+            <div className="nav-links">
+              <Link to="/">Home</Link>
+              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/historical">Historical Data</Link>
+              <Link to="/exchanges">Exchanges</Link>
             </div>
-            <div className="feature-card">
-              <div className="feature-icon">📈</div>
-              <h3>Historical Charts</h3>
-              <p>View historical OHLCV data with interactive charts and multiple timeframes</p>
-            </div>
-            <div className="feature-card">
-              <div className="feature-icon">🔄</div>
-              <h3>Multi-Exchange</h3>
-              <p>Access data from Binance, Coinbase, Kraken, and more via CCXT library</p>
-            </div>
-            <div className="feature-card">
-              <div className="feature-icon">⚡</div>
-              <h3>Fast & Cached</h3>
-              <p>Optimized performance with intelligent caching and WebSocket support</p>
+            <div className={`status-indicator ${healthStatus}`}>
+              {healthStatus === 'online' ? '🟢 Online' : '🔴 Offline'}
             </div>
           </div>
-        </div>
+        </nav>
 
-        <div className="dashboard-preview">
-          <h2>Market Data Preview</h2>
-          <div className="ticker-card">
-            <h3>BTC/USDT on Binance</h3>
-            <div className="ticker-grid">
-              <div className="ticker-item">
-                <span className="label">Last Price</span>
-                <span className="value price">$43,250.50</span>
-              </div>
-              <div className="ticker-item">
-                <span className="label">Bid</span>
-                <span className="value">$43,248.00</span>
-              </div>
-              <div className="ticker-item">
-                <span className="label">Ask</span>
-                <span className="value">$43,252.00</span>
-              </div>
-              <div className="ticker-item">
-                <span className="label">24h High</span>
-                <span className="value">$43,800.00</span>
-              </div>
-              <div className="ticker-item">
-                <span className="label">24h Low</span>
-                <span className="value">$42,800.00</span>
-              </div>
-              <div className="ticker-item">
-                <span className="label">24h Volume</span>
-                <span className="value">1,250,000.50</span>
-              </div>
-            </div>
-            <div className="demo-notice">
-              📊 <strong>Demo Mode:</strong> Showing sample data
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/historical" element={<HistoricalData />} />
+            <Route path="/exchanges" element={<Exchanges />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+
+        <footer className="footer">
+          <div className="footer-content">
+            <p>Cryptocurrency MCP Server Dashboard - Real-time Market Data</p>
+            <div className="footer-links">
+              <a href="https://github.com/Yash5247/HarshNidhi-Ventures" target="_blank" rel="noopener noreferrer">
+                GitHub
+              </a>
+              <span>•</span>
+              <a href="/dashboard">Dashboard</a>
+              <span>•</span>
+              <a href="/exchanges">Exchanges</a>
             </div>
           </div>
-        </div>
-
-        <div className="exchanges-preview">
-          <h2>Supported Exchanges</h2>
-          <div className="exchanges-grid">
-            <div className="exchange-card">
-              <h3>Binance</h3>
-              <p>ID: binance</p>
-              <span className="status-badge enabled">✓ Enabled</span>
-            </div>
-            <div className="exchange-card">
-              <h3>Coinbase</h3>
-              <p>ID: coinbase</p>
-              <span className="status-badge enabled">✓ Enabled</span>
-            </div>
-            <div className="exchange-card">
-              <h3>Kraken</h3>
-              <p>ID: kraken</p>
-              <span className="status-badge enabled">✓ Enabled</span>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      <footer className="footer">
-        <p>Cryptocurrency MCP Server Dashboard - Real-time Market Data</p>
-      </footer>
-    </div>
+        </footer>
+      </div>
+    </Router>
   );
 }
 
