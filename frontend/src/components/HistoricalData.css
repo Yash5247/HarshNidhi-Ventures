@@ -1,0 +1,15 @@
+.historical-data {
+  width: 100%;
+}
+
+.chart-container {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e0e0e0;
+}
+
+.chart-container h3 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
