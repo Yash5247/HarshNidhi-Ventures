@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../config/api';
 import Stats from './Stats';
+import ApiError from './ApiError';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -28,13 +29,18 @@ const Dashboard = () => {
   const fetchExchanges = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/exchanges`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
       const data = await response.json();
       setExchanges(data.exchanges || []);
       if (data.exchanges && data.exchanges.length > 0) {
         setSelectedExchange(data.exchanges[0].id);
       }
+      setError(null);
     } catch (err) {
-      setError('Failed to fetch exchanges');
+      console.error('Error fetching exchanges:', err);
+      setError(err);
     }
   };
 
@@ -48,12 +54,17 @@ const Dashboard = () => {
         `${API_BASE_URL}/api/ticker/${selectedExchange}/${selectedSymbol}`
       );
       if (!response.ok) {
-        throw new Error('Failed to fetch ticker data');
+        if (response.status === 404) {
+          throw new Error(`404: NOT_FOUND - ${selectedSymbol} not found on ${selectedExchange}`);
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const data = await response.json();
       setTicker(data);
+      setError(null);
     } catch (err) {
-      setError(err.message);
+      console.error('Error fetching ticker:', err);
+      setError(err);
     } finally {
       setLoading(false);
     }
@@ -120,7 +131,13 @@ const Dashboard = () => {
           </div>
         </form>
 
-        {error && <div className="error">{error}</div>}
+        {error && (
+          <ApiError 
+            error={error} 
+            onRetry={selectedExchange && selectedSymbol ? fetchTicker : fetchExchanges}
+            message={error?.message || error}
+          />
+        )}
 
         {!ticker && !loading && !error && (
           <div className="empty-state">

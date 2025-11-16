@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../config/api';
+import ApiError from './ApiError';
+import LoadingSpinner from './LoadingSpinner';
 import './Exchanges.css';
 
 const Exchanges = () => {
@@ -17,12 +19,17 @@ const Exchanges = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/exchanges`);
       if (!response.ok) {
-        throw new Error('Failed to fetch exchanges');
+        if (response.status === 404) {
+          throw new Error('404: NOT_FOUND - Exchanges endpoint not available');
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const data = await response.json();
       setExchanges(data.exchanges || []);
+      setError(null);
     } catch (err) {
-      setError(err.message);
+      console.error('Error fetching exchanges:', err);
+      setError(err);
     } finally {
       setLoading(false);
     }
@@ -31,7 +38,7 @@ const Exchanges = () => {
   if (loading) {
     return (
       <div className="card">
-        <div className="loading">Loading exchanges...</div>
+        <LoadingSpinner message="Loading exchanges..." />
       </div>
     );
   }
@@ -39,7 +46,7 @@ const Exchanges = () => {
   if (error) {
     return (
       <div className="card">
-        <div className="error">{error}</div>
+        <ApiError error={error} onRetry={fetchExchanges} />
       </div>
     );
   }

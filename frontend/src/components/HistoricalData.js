@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { API_BASE_URL } from '../config/api';
+import ApiError from './ApiError';
 import './HistoricalData.css';
 
 const HistoricalData = () => {
@@ -20,13 +21,21 @@ const HistoricalData = () => {
   const fetchExchanges = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/exchanges`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('404: NOT_FOUND - Exchanges endpoint not available');
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
       const data = await response.json();
       setExchanges(data.exchanges || []);
       if (data.exchanges && data.exchanges.length > 0) {
         setSelectedExchange(data.exchanges[0].id);
       }
+      setError(null);
     } catch (err) {
-      setError('Failed to fetch exchanges');
+      console.error('Error fetching exchanges:', err);
+      setError(err);
     }
   };
 
@@ -51,13 +60,18 @@ const HistoricalData = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch historical data');
+        if (response.status === 404) {
+          throw new Error(`404: NOT_FOUND - Historical data not found for ${selectedSymbol} on ${selectedExchange}`);
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const result = await response.json();
       setData(result.data || []);
+      setError(null);
     } catch (err) {
-      setError(err.message);
+      console.error('Error fetching historical data:', err);
+      setError(err);
     } finally {
       setLoading(false);
     }
@@ -140,7 +154,12 @@ const HistoricalData = () => {
           </button>
         </form>
 
-        {error && <div className="error">{error}</div>}
+        {error && (
+          <ApiError 
+            error={error} 
+            onRetry={selectedExchange && selectedSymbol ? () => fetchHistoricalData({ preventDefault: () => {} }) : fetchExchanges}
+          />
+        )}
 
         {data.length > 0 && (
           <div className="chart-container">
