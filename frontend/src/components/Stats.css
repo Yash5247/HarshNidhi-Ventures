@@ -51,20 +51,14 @@
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
   border-radius: 16px;
   border: 1px solid rgba(59, 130, 246, 0.3);
-  animation: float 3s ease-in-out infinite;
-  filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.3));
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.2));
 }
 
-.stat-card:nth-child(2) .stat-icon {
-  animation-delay: 0.5s;
-}
-
-.stat-card:nth-child(3) .stat-icon {
-  animation-delay: 1s;
-}
-
-.stat-card:nth-child(4) .stat-icon {
-  animation-delay: 1.5s;
+.stat-card:hover .stat-icon {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+  filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.4));
 }
 
 .stat-content {
@@ -87,14 +81,6 @@
   font-weight: 500;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
 
 @media (max-width: 768px) {
   .stats-container {

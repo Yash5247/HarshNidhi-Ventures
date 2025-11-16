@@ -185,20 +185,13 @@
   font-size: 3.5rem;
   margin-bottom: 1.5rem;
   display: inline-block;
-  animation: float 3s ease-in-out infinite;
-  filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.3));
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.2));
 }
 
-.feature-card:nth-child(2) .feature-icon {
-  animation-delay: 0.5s;
-}
-
-.feature-card:nth-child(3) .feature-icon {
-  animation-delay: 1s;
-}
-
-.feature-card:nth-child(4) .feature-icon {
-  animation-delay: 1.5s;
+.feature-card:hover .feature-icon {
+  transform: scale(1.1) translateY(-5px);
+  filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.4));
 }
 
 .feature-card h3 {
